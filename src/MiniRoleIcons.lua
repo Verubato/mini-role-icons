@@ -1,87 +1,75 @@
-local addonName = ...
-local loader
+local _, addon = ...
+---@type MiniFramework
+local mini = addon.Framework
+local config = addon.Config
 ---@type Db
 local db
----@class Db
-local dbDefaults = {
-	Tank = {
-		TextureFilePath = "Interface\\AddOns\\MiniRoleIcons\\Icons\\tank.tga",
-		Color = {
-			R = 1,
-			B = 1,
-			G = 1,
-			A = 1,
-		},
-		Width = 15,
-		Height = 15,
-	},
-	Healer = {
-		TextureFilePath = "Interface\\AddOns\\MiniRoleIcons\\Icons\\healer.tga",
-		Color = {
-			R = 1,
-			B = 1,
-			G = 1,
-			A = 1,
-		},
-		Width = 15,
-		Height = 15,
-	},
-	Dps = {
-		TextureFilePath = "Interface\\AddOns\\MiniRoleIcons\\Icons\\dps.tga",
-		Color = {
-			R = 1,
-			B = 1,
-			G = 1,
-			A = 1,
-		},
-		Width = 15,
-		Height = 15,
-	},
-}
+local icons = {}
 
-local function Notify(msg)
-	local formatted = string.format("%s - %s", addonName, msg)
-	print(formatted)
+local function GetClassColor(unit)
+	local _, classTag = UnitClass(unit)
+	local color = classTag and RAID_CLASS_COLORS and RAID_CLASS_COLORS[classTag]
+	return color and { R = color.r, G = color.g, B = color.b, A = 1 }
 end
 
-local function CopyTable(src, dst)
-	if type(dst) ~= "table" then
-		dst = {}
-	end
-
-	for k, v in pairs(src) do
-		if type(v) == "table" then
-			dst[k] = CopyTable(v, dst[k])
-		elseif dst[k] == nil then
-			dst[k] = v
-		end
-	end
-
-	return dst
-end
-
-local function UpdateRoleIcon(icon, unit)
+local function UpdateRoleIcon(icon, unit, isRefresh)
 	local role = UnitGroupRolesAssigned(unit)
-	local settings
 
-	if role == "TANK" then
-		settings = db.Tank or dbDefaults.Tank
-	elseif role == "HEALER" then
-		settings = db.Healer or dbDefaults.Healer
-	elseif role == "DAMAGER" then
-		settings = db.Dps or dbDefaults.Dps
-	else
+	if not role or role == "NONE" then
 		return
 	end
 
-	local color = settings.Color
+	local path = db.IconsPath .. role .. ".tga"
+	local original = icon.MriOriginal
 
-	icon:SetTexture(settings.TextureFilePath)
-	icon:SetVertexColor(color.R or 1, color.G or 1, color.B or 1, color.A or 1)
-	icon:SetSize(settings.Width or 10, settings.Height or 10)
+	if not db.IconsEnabled then
+		if isRefresh and original then
+			-- restore the original
+			icon:SetTexture(original.Texture)
+			icon:SetSize(original.Size[1], original.Size[2])
+			icon:SetVertexColor(original.Color[1], original.Color[2], original.Color[3], original.Color[4])
+
+			-- yes coord[3] is skipped on purpose
+			local left, top, bottom, right = original.Coord[1], original.Coord[2], original.Coord[4], original.Coord[5]
+
+			icon:SetTexCoord(left, right, top, bottom)
+
+			-- set to nil so we don't keep restoring this icon over the top of whatever it may change to
+			icon.MriOriginal = nil
+		end
+
+		return
+	end
+
+	if not isRefresh or not original then
+		icon.MriOriginal = icon.MriOriginal or {}
+
+		original = icon.MriOriginal
+
+		original.Texture = icon:GetTexture()
+		original.Coord = { icon:GetTexCoord() }
+		original.Color = { icon:GetVertexColor() }
+		-- store the size once, as we change the size we don't want to overwrite what the original size was
+		original.Size = original.Size or { icon:GetSize() }
+	end
+
+	icon:SetTexture(path)
+
+	if db.ClassColorsEnabled then
+		local color = GetClassColor(unit)
+
+		if color then
+			icon:SetVertexColor(color.R or 1, color.G or 1, color.B or 1, color.A or 1)
+		end
+	else
+		icon:SetVertexColor(1, 1, 1, 1)
+	end
 
 	-- show the entire texture
 	icon:SetTexCoord(0, 1, 0, 1)
+
+	-- replace the existing icon
+	icon:SetSize(db.IconsWidth or 10, db.IconsHeight or 10)
 
 	-- don't call show here, as blizzard/suf may have hidden it for pet/target frames
 end
@@ -94,7 +82,9 @@ local function OnUpdateRoleIcon(frame)
 	local unit = frame.unit
 	local icon = frame.roleIcon
 
-	UpdateRoleIcon(icon, unit)
+	UpdateRoleIcon(icon, unit, false)
+
+	icons[unit] = icon
 end
 
 local function OnSufUpdateRoleIcon(_, frame)
@@ -109,37 +99,35 @@ local function OnSufUpdateRoleIcon(_, frame)
 	local unit = frame.unit
 	local icon = frame.indicators.lfdRole
 
-	UpdateRoleIcon(icon, unit)
+	UpdateRoleIcon(icon, unit, false)
+
+	icons[unit] = icon
 end
 
-local function InitDb()
-	MiniRoleIconsDB = MiniRoleIconsDB or {}
-	db = CopyTable(dbDefaults, MiniRoleIconsDB)
-end
+local function OnAddonLoaded()
+	db = mini:GetSavedVars(dbDefaults)
+	config:Init()
 
-local function OnAddonLoaded(_, _, name)
-	if name ~= addonName then
-		return
+	if not CompactUnitFrame_UpdateRoleIcon then
+		mini:Notify("Missing CompactUnitFrame_UpdateRoleIcon")
+	else
+		hooksecurefunc("CompactUnitFrame_UpdateRoleIcon", OnUpdateRoleIcon)
 	end
 
-	InitDb()
-end
+	-- if shadowed unit frames is enabled
+	if ShadowUF then
+		local indicatorModule = ShadowUF.modules["indicators"]
 
-loader = CreateFrame("Frame")
-loader:RegisterEvent("ADDON_LOADED")
-loader:SetScript("OnEvent", OnAddonLoaded)
-
-if not CompactUnitFrame_UpdateRoleIcon then
-	Notify("Missing CompactUnitFrame_UpdateRoleIcon")
-else
-	hooksecurefunc("CompactUnitFrame_UpdateRoleIcon", OnUpdateRoleIcon)
-end
-
--- if shadowed unit frames is enabled
-if ShadowUF then
-	local indicatorModule = ShadowUF.modules["indicators"]
-
-	if indicatorModule and indicatorModule.UpdateLFDRole then
-		hooksecurefunc(indicatorModule, "UpdateLFDRole", OnSufUpdateRoleIcon)
+		if indicatorModule and indicatorModule.UpdateLFDRole then
+			hooksecurefunc(indicatorModule, "UpdateLFDRole", OnSufUpdateRoleIcon)
+		end
 	end
 end
+
+function addon:Refresh()
+	for unit, icon in pairs(icons) do
+		UpdateRoleIcon(icon, unit, true)
+	end
+end
+
+mini:WaitForAddonLoad(OnAddonLoaded)
