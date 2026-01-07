@@ -4,7 +4,7 @@
 ## Author: Verz, Pwr
 ## Version: 0.0.1
 ## SavedVariables: MiniRoleIconsDB
-## IconTexture: Interface\AddOns\MiniRoleIcons\Icons\addon.blp
+## IconTexture: Interface\AddOns\MiniRoleIcons\Icons\Addon.blp
 ## OptionalDeps: ShadowedUnitFrames
 ## X-Curse-Project-ID: 1422921
 
