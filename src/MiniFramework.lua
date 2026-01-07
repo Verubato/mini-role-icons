@@ -27,6 +27,39 @@ local function AddControlForRefresh(panel, control)
 	end
 end
 
+local function ConfigureNumbericBox(box, allowNegative)
+	if not allowNegative then
+		box:SetNumeric(true)
+		return
+	end
+
+	box:HookScript("OnTextChanged", function(boxSelf, userInput)
+		if not userInput then
+			return
+		end
+
+		local text = boxSelf:GetText()
+
+		-- allow: "", "-", "-123", "123"
+		if text == "" or text == "-" or text:match("^%-?%d+$") then
+			return
+		end
+
+		-- strip invalid chars
+		text = text:gsub("[^%d%-]", "")
+		-- only one leading '-'
+		text = text:gsub("%-+", "-")
+
+		if text:sub(1, 1) ~= "-" then
+			text = text:gsub("%-", "")
+		else
+			text = "-" .. text:sub(2):gsub("%-", "")
+		end
+
+		boxSelf:SetText(text)
+	end)
+end
+
 function M:Notify(msg, ...)
 	local formatted = string.format(msg, ...)
 	print(addonName .. " - " .. formatted)
@@ -162,37 +195,8 @@ function M:CreateEditBox(options)
 	box:SetSize(options.Width or 80, options.Height or 20)
 	box:SetAutoFocus(false)
 
-	if options.Numeric == true then
-		if options.AllowNegatives == true then
-			-- can't use SetNumeric(true) because it doesn't allow negatives
-			box:SetScript("OnTextChanged", function(boxSelf, userInput)
-				if not userInput then
-					return
-				end
-
-				local text = boxSelf:GetText()
-
-				-- allow: "", "-", "-123", "123"
-				if text == "" or text == "-" or text:match("^%-?%d+$") then
-					return
-				end
-
-				-- strip invalid chars
-				text = text:gsub("[^%d%-]", "")
-				-- only one leading '-'
-				text = text:gsub("%-+", "-")
-
-				if text:sub(1, 1) ~= "-" then
-					text = text:gsub("%-", "")
-				else
-					text = "-" .. text:sub(2):gsub("%-", "")
-				end
-
-				boxSelf:SetText(text)
-			end)
-		else
-			box:SetNumeric(true)
-		end
+	if options.Numeric then
+		ConfigureNumbericBox(box, options.AllowNegatives)
 	end
 
 	local function Commit()
@@ -433,19 +437,19 @@ function M:CreateSlider(options)
 	end
 
 	local box = CreateFrame("EditBox", nil, options.Parent, "InputBoxTemplate")
+	ConfigureNumbericBox(box, options.Min < 0)
+
 	box:SetPoint("CENTER", slider, "CENTER", 0, 30)
 	box:SetFontObject("GameFontWhite")
 	box:SetSize(50, 20)
 	box:SetAutoFocus(false)
 	box:SetMaxLetters(math.log(options.Max, 10) + 1)
 	box:SetText(tostring(options.GetValue()))
-	box:SetCursorPosition(0)
 	box:SetJustifyH("CENTER")
-	box:SetNumeric(true)
 	box:SetCursorPosition(0)
 
 	slider:SetScript("OnValueChanged", function(_, sliderValue, userInput)
-		if systemChange or (userInput ~= nil and not userInput) then
+		if userInput ~= nil and not userInput then
 			return
 		end
 
@@ -461,18 +465,7 @@ function M:CreateSlider(options)
 
 		local value = tonumber(box:GetText())
 
-		if value > options.Max then
-			local valueString = tostring(options.Max)
-			box:SetText(valueString)
-			box:SetCursorPosition(#valueString)
-		end
-
-		if value < options.Min then
-			local valueString = tostring(options.Min)
-			box:SetText(valueString)
-			box:SetCursorPosition(#valueString)
-		end
-
+		-- don't clamp values here, because they might still be typing out a number
 		if not value then
 			return
 		end
@@ -480,6 +473,20 @@ function M:CreateSlider(options)
 		slider:SetValue(value)
 		options.SetValue(value)
 	end)
+
+	function box.MiniRefresh(boxSelf)
+		local value = options.GetValue()
+		boxSelf:SetText(tostring(value))
+		boxSelf:SetCursorPosition(0)
+	end
+
+	function slider.MiniRefresh(sliderSelf)
+		local value = options.GetValue()
+		sliderSelf:SetValue(value)
+	end
+
+	AddControlForRefresh(options.Parent, slider)
+	AddControlForRefresh(options.Parent, box)
 
 	return slider, box, label
 end
