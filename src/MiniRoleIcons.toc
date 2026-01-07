@@ -6,6 +6,7 @@
 ## SavedVariables: MiniRoleIconsDB
 ## IconTexture: Interface\AddOns\MiniRoleIcons\Icons\addon.blp
 ## OptionalDeps: ShadowedUnitFrames
+## X-Curse-Project-ID: 1422921
 
 MiniFramework.lua
 Config.lua
