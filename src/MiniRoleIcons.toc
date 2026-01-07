@@ -1,10 +1,12 @@
 ## Interface: 120001, 120000, 110207, 50503, 40402, 38000, 30405, 20505, 11508
 ## Title: MiniRoleIcons
 ## Notes: Changes the role icons on unit frames.
-## Author: Verz
+## Author: Verz, Pwr
 ## Version: 0.0.1
 ## SavedVariables: MiniRoleIconsDB
 ## IconTexture: Interface\AddOns\MiniRoleIcons\Icons\addon.blp
 ## OptionalDeps: ShadowedUnitFrames
 
+MiniFramework.lua
+Config.lua
 MiniRoleIcons.lua
