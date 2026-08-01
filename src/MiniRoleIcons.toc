@@ -8,6 +8,6 @@
 ## OptionalDeps: ShadowedUnitFrames
 ## X-Curse-Project-ID: 1422921
 
-MiniFramework.lua
+Libs\MiniFramework\MiniFramework.xml
 Config.lua
 MiniRoleIcons.lua

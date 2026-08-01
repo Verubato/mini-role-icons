@@ -31,14 +31,14 @@ function M:Init()
 		return
 	end
 
-	local version = C_AddOns.GetAddOnMetadata(addonName, "Version")
-	local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-	title:SetPoint("TOPLEFT", 0, -verticalSpacing)
-	title:SetText(string.format("%s - %s", addonName, version))
-
-	local description = panel:CreateFontString(nil, "ARTWORK", "GameFontWhite")
-	description:SetPoint("TOPLEFT", title, 0, -verticalSpacing)
-	description:SetText("Configure the role icons used on unit frames.")
+	local header = mini:PanelHeader({
+		Parent = panel,
+		Description = "Configure the role icons used on unit frames.",
+		Y = -verticalSpacing,
+		-- the description used to hang off the title's top left, so the gap below it
+		-- is the offset minus the title's line height
+		Gap = verticalSpacing - 16,
+	})
 
 	local reloadButton = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
 	reloadButton:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", 0, verticalSpacing)
@@ -49,7 +49,7 @@ function M:Init()
 	end)
 	reloadButton:SetShown(false)
 
-	local enabledChkBox = mini:CreateSettingCheckbox({
+	local enabledChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Custom Icons",
 		Tooltip = "Use our custom icons. Note this may require a reload when disabling.",
@@ -67,9 +67,9 @@ function M:Init()
 		end,
 	})
 
-	enabledChkBox:SetPoint("TOPLEFT", description, "BOTTOMLEFT", 0, -verticalSpacing)
+	enabledChkBox:SetPoint("TOPLEFT", header.Anchor, "BOTTOMLEFT", 0, -verticalSpacing)
 
-	local classColorsChkBox = mini:CreateSettingCheckbox({
+	local classColorsChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Class Colors",
 		Tooltip = "Use class colours for the role icons",
@@ -84,7 +84,7 @@ function M:Init()
 
 	classColorsChkBox:SetPoint("LEFT", enabledChkBox.Text, "RIGHT", horizontalSpacing, 0)
 
-	local widthSlider, widthEditBox = mini:CreateSlider({
+	local width = mini:Slider({
 		Parent = panel,
 		LabelText = "Width",
 		Min = 1,
@@ -103,9 +103,10 @@ function M:Init()
 		end,
 	})
 
+	local widthSlider, widthEditBox = width.Slider, width.EditBox
 	widthSlider:SetPoint("TOPLEFT", enabledChkBox, "BOTTOMLEFT", 0, -verticalSpacing * 2)
 
-	local heightSlider, heightEditBox = mini:CreateSlider({
+	local height = mini:Slider({
 		Parent = panel,
 		LabelText = "Height",
 		Min = 1,
@@ -124,6 +125,7 @@ function M:Init()
 		end,
 	})
 
+	local heightSlider, heightEditBox = height.Slider, height.EditBox
 	heightSlider:SetPoint("TOPLEFT", widthSlider, "BOTTOMLEFT", 0, -verticalSpacing * 2)
 
 	mini:WireTabNavigation({
