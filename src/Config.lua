@@ -34,7 +34,6 @@ function M:Init()
 	local header = mini:PanelHeader({
 		Parent = panel,
 		Description = "Configure the role icons used on unit frames.",
-		Y = -verticalSpacing,
 		-- the description used to hang off the title's top left, so the gap below it
 		-- is the offset minus the title's line height
 		Gap = verticalSpacing - 16,
