@@ -17,11 +17,11 @@ Feedback and feature requests are more than welcome!
 
 ## Screenshots
 
-![MiniRoleIcons screenshot](https://media.forgecdn.net/attachments/1480/179/screenshot-settings-png.png)
+![MiniRoleIcons screenshot](https://raw.githubusercontent.com/Verubato/mini-role-icons/main/assets/ScreenshotSettings.png)
 
-![MiniRoleIcons screenshot](https://media.forgecdn.net/attachments/1455/754/screenshot-2-png.png)
+![MiniRoleIcons screenshot](https://raw.githubusercontent.com/Verubato/mini-role-icons/main/assets/Screenshot2.png)
 
-![MiniRoleIcons screenshot](https://media.forgecdn.net/attachments/1455/608/screenshot-1-png.png)
+![MiniRoleIcons screenshot](https://raw.githubusercontent.com/Verubato/mini-role-icons/main/assets/Screenshot1.png)
 
 ## Download
 
