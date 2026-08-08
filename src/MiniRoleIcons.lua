@@ -109,7 +109,7 @@ local function OnAddonLoaded()
 	config:Init()
 
 	if not CompactUnitFrame_UpdateRoleIcon then
-		mini:Notify("Missing CompactUnitFrame_UpdateRoleIcon")
+		mini:NotifyWithPrefix("Missing CompactUnitFrame_UpdateRoleIcon")
 	else
 		hooksecurefunc("CompactUnitFrame_UpdateRoleIcon", OnUpdateRoleIcon)
 	end
