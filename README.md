@@ -17,11 +17,11 @@ Feedback and feature requests are more than welcome!
 
 ## Screenshots
 
-![MiniRoleIcons screenshot](https://raw.githubusercontent.com/Verubato/mini-role-icons/main/assets/ScreenshotSettings.png)
+![MiniRoleIcons screenshot](https://raw.githubusercontent.com/Verubato/mini-role-icons/main/assets/Screenshots/Settings.png)
 
-![MiniRoleIcons screenshot](https://raw.githubusercontent.com/Verubato/mini-role-icons/main/assets/Screenshot2.png)
+![MiniRoleIcons screenshot](https://raw.githubusercontent.com/Verubato/mini-role-icons/main/assets/Screenshots/Raid40.png)
 
-![MiniRoleIcons screenshot](https://raw.githubusercontent.com/Verubato/mini-role-icons/main/assets/Screenshot1.png)
+![MiniRoleIcons screenshot](https://raw.githubusercontent.com/Verubato/mini-role-icons/main/assets/Screenshots/RaidFrames.png)
 
 ## Download
 
