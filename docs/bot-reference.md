@@ -1,8 +1,8 @@
 # MiniRoleIcons - bot reference
 
-Version 1.2.3. Interface versions: 120100, 120007, 120001, 120000, 110207,
-50504, 40402, 38002, 38000, 30405, 20506, 11509 (retail plus the classic
-client lines). Saved variables: MiniRoleIconsDB (account-wide).
+Version 1.2.4. Interface versions: 120100, 50504, 40402, 38002, 38000,
+30405, 20506, 11509 (retail plus the classic client lines). Saved
+variables: MiniRoleIconsDB (account-wide).
 
 ## What it does
 
