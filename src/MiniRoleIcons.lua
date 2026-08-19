@@ -8,12 +8,24 @@ local icons = {}
 
 local function GetClassColor(unit)
 	local _, classTag = UnitClass(unit)
+
+	-- a secret class can't be used as a table key
+	if mini:IsSecret(classTag) then
+		return nil
+	end
+
 	local color = classTag and RAID_CLASS_COLORS and RAID_CLASS_COLORS[classTag]
 	return color and { R = color.r, G = color.g, B = color.b, A = 1 }
 end
 
 local function UpdateRoleIcon(icon, unit, isRefresh)
 	local role = UnitGroupRolesAssigned(unit)
+
+	-- 12.0 hands out the arena roles as secret values, which can't be compared or concatenated,
+	-- so leave those icons as blizzard drew them
+	if mini:IsSecret(role) then
+		return
+	end
 
 	if not role or role == "NONE" then
 		return
