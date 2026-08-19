@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.6
+
+Fixed an error in arena on 12.0 clients, where the role is a secret value that can't be read.
+
 ## 1.2.5
 
 Added a Mini category so the addon groups with the other Mini addons in the addon list.
