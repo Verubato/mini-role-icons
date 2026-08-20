@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.7
+
+Fixed disabling custom icons restoring the addon's own icon instead of Blizzard's, and reduced CPU use on group frame updates.
+
 ## 1.2.6
 
 Fixed an error in arena on 12.0 clients, where the role is a secret value that can't be read.
