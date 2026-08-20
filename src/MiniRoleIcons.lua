@@ -5,7 +5,14 @@ local config = addon.Config
 ---@type Db
 local db
 local icons = {}
+-- texture path per role, and the IconsPath they were built from. blizzard runs the role icon
+-- update for every group frame it refreshes, so build the path once rather than on each one
+local iconPaths = {}
+local iconPathsBuiltFrom
 
+---@return number? r
+---@return number? g
+---@return number? b
 local function GetClassColor(unit)
 	local _, classTag = UnitClass(unit)
 
@@ -15,7 +22,29 @@ local function GetClassColor(unit)
 	end
 
 	local color = classTag and RAID_CLASS_COLORS and RAID_CLASS_COLORS[classTag]
-	return color and { R = color.r, G = color.g, B = color.b, A = 1 }
+
+	if not color then
+		return nil
+	end
+
+	-- loose values rather than a table; this runs per frame per refresh
+	return color.r, color.g, color.b
+end
+
+local function GetIconPath(role)
+	if iconPathsBuiltFrom ~= db.IconsPath then
+		wipe(iconPaths)
+		iconPathsBuiltFrom = db.IconsPath
+	end
+
+	local path = iconPaths[role]
+
+	if not path then
+		path = db.IconsPath .. role .. ".tga"
+		iconPaths[role] = path
+	end
+
+	return path
 end
 
 local function UpdateRoleIcon(icon, unit, isRefresh)
@@ -31,7 +60,7 @@ local function UpdateRoleIcon(icon, unit, isRefresh)
 		return
 	end
 
-	local path = db.IconsPath .. role .. ".tga"
+	local path = GetIconPath(role)
 	local original = icon.MriOriginal
 
 	if not db.IconsEnabled then
@@ -53,25 +82,30 @@ local function UpdateRoleIcon(icon, unit, isRefresh)
 		return
 	end
 
-	if not isRefresh or not original then
-		icon.MriOriginal = icon.MriOriginal or {}
-
-		original = icon.MriOriginal
+	-- captured once, while the icon still holds what blizzard drew. capturing again later
+	-- would store our own texture as the original, and disabling would restore it to itself
+	if not original then
+		original = {}
+		icon.MriOriginal = original
 
 		original.Texture = icon:GetTexture()
 		original.Coord = { icon:GetTexCoord() }
 		original.Color = { icon:GetVertexColor() }
-		-- store the size once, as we change the size we don't want to overwrite what the original size was
-		original.Size = original.Size or { icon:GetSize() }
+		original.Size = { icon:GetSize() }
 	end
 
-	icon:SetTexture(path)
+	-- blizzard's role update sets the texcoord and visibility but leaves the texture file the
+	-- template gave it, so after the first pass this is already ours and the swap is the one
+	-- expensive call here
+	if icon:GetTexture() ~= path then
+		icon:SetTexture(path)
+	end
 
 	if db.ClassColorsEnabled then
-		local color = GetClassColor(unit)
+		local r, g, b = GetClassColor(unit)
 
-		if color then
-			icon:SetVertexColor(color.R or 1, color.G or 1, color.B or 1, color.A or 1)
+		if r then
+			icon:SetVertexColor(r, g, b, 1)
 		end
 	else
 		icon:SetVertexColor(1, 1, 1, 1)
@@ -117,7 +151,7 @@ local function OnSufUpdateRoleIcon(_, frame)
 end
 
 local function OnAddonLoaded()
-	db = mini:GetSavedVars(dbDefaults)
+	db = mini:GetSavedVars(config.DbDefaults)
 	config:Init()
 
 	if not CompactUnitFrame_UpdateRoleIcon then
