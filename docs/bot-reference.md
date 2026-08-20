@@ -20,7 +20,8 @@ colouring and a configurable size. Also supports Shadowed Unit Frames.
 - Shadowed Unit Frames: if SUF is loaded, the addon also hooks its
   "lfdRole" indicator, and only when that indicator is enabled in SUF.
 - Before replacing an icon it stores the original texture, size, colour and
-  texture coordinates so they can be restored when the feature is disabled.
+  texture coordinates so they can be restored when the feature is disabled. The
+  capture happens once per icon, while it still holds what Blizzard drew.
 
 ## Settings
 
@@ -46,8 +47,9 @@ name plus ".tga" to this path. Only the "Pwr" icon set ships with the addon.
 - "Icons didn't change": the unit probably has no assigned role. Roles are
   assigned in dungeons, raids and via the role check; open-world units
   without a role are untouched.
-- "I disabled Custom Icons but the old icons look wrong": restoring originals
-  is best-effort; use the Reload button on the panel (or /reload).
+- "I disabled Custom Icons but the old icons look wrong": use the Reload button
+  on the panel (or /reload). A frame Blizzard has recycled onto another unit can
+  briefly show the previous role's icon until it next repaints.
 - "Not working on Shadowed Unit Frames": enable the LFD role indicator in
   SUF; the addon only recolours/replaces that indicator when SUF has it
   enabled.
