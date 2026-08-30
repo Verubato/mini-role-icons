@@ -40,6 +40,7 @@ function M:Init()
 		-- the description used to hang off the title's top left, so the gap below it
 		-- is the offset minus the title's line height
 		Gap = verticalSpacing - 16,
+		Divider = true,
 	})
 
 	local reloadButton = mini:Button({
