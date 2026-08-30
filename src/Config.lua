@@ -20,6 +20,9 @@ local M = {
 addon.Config = M
 
 function M:Init()
+	-- A styled button clashes with the stock Blizzard art around it in the settings screen.
+	mini:SetCustomStyling(true, { Button = false })
+
 	db = mini:GetSavedVars(dbDefaults)
 
 	local panel = CreateFrame("Frame")
@@ -39,13 +42,16 @@ function M:Init()
 		Gap = verticalSpacing - 16,
 	})
 
-	local reloadButton = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+	local reloadButton = mini:Button({
+		Parent = panel,
+		Text = "Reload",
+		Width = 100,
+		OnClick = function()
+			ReloadUI()
+		end,
+	})
+
 	reloadButton:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", 0, verticalSpacing)
-	reloadButton:SetWidth(100)
-	reloadButton:SetText("Reload")
-	reloadButton:SetScript("OnClick", function()
-		ReloadUI()
-	end)
 	reloadButton:SetShown(false)
 
 	local enabledChkBox = mini:Checkbox({
