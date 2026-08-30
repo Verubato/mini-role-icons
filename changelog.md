@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.8
+
+UI improvements.
+
 ## 1.2.7
 
 Fixed disabling custom icons restoring the addon's own icon instead of Blizzard's, and reduced CPU use on group frame updates.
