@@ -3,7 +3,7 @@
 ## Notes: Changes the role icons on unit frames.
 ## Category: Mini
 ## Author: Verz, Pwr
-## Version: 1.2.8
+## Version: 1.2.9
 ## SavedVariables: MiniRoleIconsDB
 ## IconTexture: Interface\AddOns\MiniRoleIcons\Icons\Addon.blp
 ## OptionalDeps: ShadowedUnitFrames
